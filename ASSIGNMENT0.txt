@@ -1,0 +1,122 @@
+create table suppliers(
+    sid number(3) constraint pk_s_id primary key,
+    sname varchar2(30) constraint nn_s_name not null,
+    city varchar2(15) constraint nn_s_city not null);
+    
+ 
+create table part(
+    pid number(3) constraint pk_pid primary key,
+    pname varchar2(30) constraint nn_pname not null,
+    color varchar2(10) constraint nn_color not null);
+    
+
+create table catalog(
+    sid number(3) constraint fk_sid references suppliers(sid),
+    pid number(3) constraint fk_pid references part(pid),
+    cost number(4) constraint ck_cost check(cost>0),
+    constraint pk_sid_pid primary key(sid,pid));
+    
+    
+insert into suppliers
+values(50,'DHOLAKIYA','CHENNAI');
+
+insert into suppliers
+values(55,'GONDALIYA','MUMBAI');
+
+insert into suppliers
+values(60,'TIWARI','CHENNAI');
+
+insert into suppliers(sid,sname,city)
+values(65,'SHAH','BANGLORE');
+
+insert into suppliers(sid,sname,city)
+values(70,'PATEL','DELHI');
+
+insert into suppliers(sid,sname,city)
+values(75,'MAHETA','KOLKATA');
+
+
+insert into part
+values(111,'PARTHIV','GREEN');
+
+insert into part
+values(112,'SANDHYA','RED');
+
+insert into part
+values(113,'PAVAN','BLUE');
+
+insert into part(pid,pname,color)
+values(114,'KRUNAL','YELLOW');
+
+insert into part(pid,pname,color)
+values(115,'RAHUL','ORANGE');
+
+insert into part(pid,pname,color)
+values(116,'KAVITA','PINK');
+
+insert into catalog 
+values(60,112,1300);
+
+insert into catalog 
+values(70,114,6150);
+
+insert into catalog 
+values(55,111,1050);
+
+insert into catalog(sid,pid,cost) 
+values(60,116,150);
+
+insert into catalog(sid,pid,cost) 
+values(75,112,2350);
+
+insert into catalog(sid,pid,cost) 
+values(70,116,450);
+
+alter table part add weight number(2,3);
+
+alter table suppliers modify city varchar2(15) constraint ck_s_city check(city in('MUMBAI','DELHI','BANGLORE','KOLKATA','CHENNAI'));
+
+
+update part set color = 'GREY'
+where pid = 111;
+
+update suppliers set city = 'MUMBAI'
+where upper(sname) = 'PATEL';
+
+delete from catalog
+where cost > 100 and cost < 500;
+
+alter table suppliers add country varchar2(15);
+
+update suppliers set country = 'INDIA'
+where sid = 50;
+
+update suppliers set country = 'AUSTRALIA'
+where sid = 55;
+
+update suppliers set country = 'UNITED KINGDOM'
+where sid = 60;
+
+update suppliers set country = 'NEW ZEALAND'
+where sid = 65;
+
+update suppliers set country = 'UNITED STATUS'
+where sid = 70;
+
+update suppliers set country = 'CANADA'
+where sid = 75;
+
+
+alter table part modify color varchar2(20);
+
+alter table part modify pname varchar2(25);
+
+select * from suppliers
+where upper(city) = 'CHENNAI';
+
+select sid,pid from catalog
+where cost between 1000 and 5000;
+
+desc part
+
+select * from suppliers
