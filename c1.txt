@@ -1,0 +1,337 @@
+create table candidate(
+    cid number(5) constraint pk_cid primary key,
+    cname varchar2(15) constraint nn_name not null,
+    caddress varchar2(10) constraint nn_add not null,
+    cbirth_date date);
+    
+create table test(
+    tid number(5) constraint pk_tid primary key,
+    tname varchar2(15) constraint nn_tname not null,
+    tot_marks number(3),
+    pass_marks number(3));
+    
+create table test_center(
+    tcid number(5) constraint pk_tcid primary key,
+    location varchar2(10) constraint nn_loc not null,
+    mgr number(5),
+    capacity number(4));
+    
+create table test_taken(
+    cid number(5),
+    tid number(5),
+    tcid number(5),
+    test_date date,
+    score number(3),
+    constraint pk_cttcid primary key(cid,tid,tcid));
+    
+    
+insert into candidate values(201,'PARTHIV','SURAT','5-Jun-02');
+
+insert into candidate values(202,'PARESH','VADODARA','15-Apr-04');
+
+insert into candidate values(203,'DARSHIL','SURAT','6-Nov-99');
+
+insert into candidate values(204,'AKSHAY','AHEMDABAD','31-Oct-02');
+
+insert into candidate values(205,'JIYAN','VADODARA','17-Oct-94');
+
+insert into candidate values(206,'PRINCE','RAJKOT','25-Jun-03');
+
+insert into candidate values(207,'HARDIK','SURAT','14-Dec-08');
+
+insert into candidate values(208,'SANDEEP','AHEMDABAD','27-Jul-99');
+
+insert into candidate values(209,'KETAN','AMRELI','22-Aug-01');
+
+insert into candidate values(210,'RAJ','RAJKOT','29-Sep-03');
+
+
+insert into test values(551,'JEE MAIN',360,60);
+
+insert into test values(552,'JEE ADVANCE',300,45);
+
+insert into test values(553,'GUJCET',120,40);
+
+insert into test values(554,'GHSEB',100,33);
+
+insert into test values(555,'NEET',720,85);
+
+
+insert into test_center values(14651,'VADODARA',56,12);
+
+insert into test_center values(14652,'SURAT',78,2);
+
+insert into test_center values(14653,'AHEMDABAD',86,53);
+
+insert into test_center values(14654,'RAJKOT',64,65);
+
+insert into test_center values(14655,'AMRELI',40,28);
+
+
+insert into test_taken values(201,551,14653,'5-Sep-20',35);
+
+insert into test_taken values(203,554,14652,'15-Oct-21',48);
+
+insert into test_taken values(204,552,14655,'21-Aug-16',162);
+
+insert into test_taken values(201,555,14651,'17-Dec-19',120);
+
+insert into test_taken values(204,554,14652,'22-Nov-20',100);
+
+insert into test_taken values(208,554,14654,'11-Jan-22',45);
+
+insert into test_taken values(210,552,14655,'17-Dec-19',62);
+
+insert into test_taken values(209,551,14653,'28-Jun-19',250);
+
+insert into test_taken values(206,553,14653,'14-Jun-16',80);
+
+insert into test_taken values(202,554,14652,'15-oct-21',85);
+
+insert into test_taken values(205,554,14655,'14-Sep-15',32);
+
+insert into test_taken values(207,552,14654,'14-Feb-12',8);
+
+insert into test_taken values(208,551,14652,'22-Nov-20',12);
+
+insert into test_taken values(210,553,14651,'21-Mar-18',87);
+
+insert into test_taken values(206,555,14651,'20-May-19',526);
+
+insert into test_taken values(204,554,14653,'15-Apr-20',74);
+
+insert into test_taken values(203,551,14655,'8-Jun-21',91);
+
+insert into test_taken values(206,552,14653,'17-May-22',253);
+
+insert into test_taken values(207,554,14652,'14-Oct-20',78);
+
+insert into test_taken values(209,553,14654,'15-Apr-20',41);
+
+
+
+declare
+
+    cursor c1 is select * from test_taken;
+    cursor c2 is select * from candidate;
+    cursor c3(t_cid test_center.tcid%type) is select test_date from test_taken
+                                              where tcid = t_cid 
+                                              group by test_date
+                                              having count(*) = (select capacity from test_center
+                                                                 where tcid = t_cid);
+
+    t_id test_taken.tid%type;
+    t_cid test_taken.tcid%type;
+
+    pr number(5,2);
+    atd number(5);
+    
+    
+begin
+  
+    t_id := 554;
+    t_cid := 14652;
+    
+    for r1 in c1
+    loop
+        
+        select avg(score) into pr from test_taken 
+        where r1.tid = tid and r1.tcid = tcid
+        group by tid;
+
+        if (r1.score > pr and r1.tcid = t_cid and r1.tid = t_id) then
+            
+            for r2 in c2
+            loop
+                if(r1.cid = r2.cid) then
+                    dbms_output.put_line(r2.cid || ' ' || r2.cname || ' ' || r2.caddress || ' ' || r2.cbirth_date);
+                end if;
+            end loop;
+            
+        end if;
+    end loop;
+
+    dbms_output.put_line('***** Some Dates on which ' || t_cid || ' had full attendance:- *****');
+    
+    for r3 in c3(t_cid)
+    loop
+            dbms_output.put_line(r3.test_date);
+    end loop;
+    
+end;
+/
+
+
+
+
+
+---------------------------------
+
+
+
+
+
+
+
+
+create table candidate(
+    cid number(5) constraint pk_cid primary key,
+    cname varchar2(15) constraint nn_name not null,
+    caddress varchar2(10) constraint nn_add not null,
+    cbirth_date date);
+    
+create table test(
+    tid number(5) constraint pk_tid primary key,
+    tname varchar2(15) constraint nn_tname not null,
+    tot_marks number(3),
+    pass_marks number(3));
+    
+create table test_center(
+    tcid number(5) constraint pk_tcid primary key,
+    location varchar2(10) constraint nn_loc not null,
+    mgr number(5),
+    capacity number(4));
+    
+create table test_taken(
+    cid number(5),
+    tid number(5),
+    tcid number(5),
+    test_date date,
+    score number(3),
+    constraint pk_cttcid primary key(cid,tid,tcid));
+    
+    
+insert into candidate values(201,'PARTHIV','SURAT','5-Jun-02');
+
+insert into candidate values(202,'PARESH','VADODARA','15-Apr-04');
+
+insert into candidate values(203,'DARSHIL','SURAT','6-Nov-99');
+
+insert into candidate values(204,'AKSHAY','AHEMDABAD','31-Oct-02');
+
+insert into candidate values(205,'JIYAN','VADODARA','17-Oct-94');
+
+insert into candidate values(206,'PRINCE','RAJKOT','25-Jun-03');
+
+insert into candidate values(207,'HARDIK','SURAT','14-Dec-08');
+
+insert into candidate values(208,'SANDEEP','AHEMDABAD','27-Jul-99');
+
+insert into candidate values(209,'KETAN','AMRELI','22-Aug-01');
+
+insert into candidate values(210,'RAJ','RAJKOT','29-Sep-03');
+
+
+insert into test values(551,'JEE MAIN',360,60);
+
+insert into test values(552,'JEE ADVANCE',300,45);
+
+insert into test values(553,'GUJCET',120,40);
+
+insert into test values(554,'GHSEB',100,33);
+
+insert into test values(555,'NEET',720,85);
+
+
+insert into test_center values(14651,'VADODARA',56,12);
+
+insert into test_center values(14652,'SURAT',78,2);
+
+insert into test_center values(14653,'AHEMDABAD',86,53);
+
+insert into test_center values(14654,'RAJKOT',64,65);
+
+insert into test_center values(14655,'AMRELI',40,28);
+
+
+insert into test_taken values(201,551,14653,'5-Sep-20',35);
+
+insert into test_taken values(203,554,14652,'15-Oct-21',48);
+
+insert into test_taken values(204,552,14655,'21-Aug-16',162);
+
+insert into test_taken values(201,555,14651,'17-Dec-19',120);
+
+insert into test_taken values(204,554,14652,'22-Nov-20',100);
+
+insert into test_taken values(208,554,14654,'11-Jan-22',45);
+
+insert into test_taken values(210,552,14655,'17-Dec-19',62);
+
+insert into test_taken values(209,551,14653,'28-Jun-19',250);
+
+insert into test_taken values(206,553,14653,'14-Jun-16',80);
+
+insert into test_taken values(202,554,14652,'15-oct-21',85);
+
+insert into test_taken values(205,554,14655,'14-Sep-15',32);
+
+insert into test_taken values(207,552,14654,'14-Feb-12',8);
+
+insert into test_taken values(208,551,14652,'22-Nov-20',12);
+
+insert into test_taken values(210,553,14651,'21-Mar-18',87);
+
+insert into test_taken values(206,555,14651,'20-May-19',526);
+
+insert into test_taken values(204,554,14653,'15-Apr-20',74);
+
+insert into test_taken values(203,551,14655,'8-Jun-21',91);
+
+insert into test_taken values(206,552,14653,'17-May-22',253);
+
+insert into test_taken values(207,554,14652,'14-Oct-20',78);
+
+insert into test_taken values(209,553,14654,'15-Apr-20',41);
+
+
+
+declare
+    
+    cursor c1(c_id candidate.cid%type) is select tid,score from test_taken
+                 where cid = c_id;
+    cursor c2 is select * from test;
+    
+    c_id candidate.cid % type;
+    m number(3);
+begin
+
+    c_id := 206;
+    
+    dbms_output.put_line('***** TEST DETAILS :- ******');
+    dbms_output.put_line('TEST_ID TEST_NAME TOTAL_MARKS PASS_MARKS');
+    for r1 in c1(c_id)
+    loop
+    
+        for r2 in c2
+        loop
+        
+            if(r2.tid = r1.tid) then
+                dbms_output.put_line(r2.tid || ' ' || r2.tname || ' ' || r2.tot_marks || ' ' || r2.pass_marks);
+            end if;
+        end loop;
+    end loop;
+    
+    dbms_output.put_line('***** SCORE OF STUDENT ' || c_id || ' IN DIFFERENT TESTS ARE :- *****');
+    dbms_output.put_line('TEST ID - SCORE');
+    
+    for r1 in c1(c_id)
+    loop
+            dbms_output.put_line(r1.tid || ' - ' || r1.score);
+    end loop;
+    
+    dbms_output.put_line('***** MAXIMUM SCORE OF DIFFERENT TESTS ARE IN WHICH, STUDENT ' || c_id || ' IS APPERED. *****');
+    dbms_output.put_line('TEST ID - MAXIMUM SCORE');
+    
+    for r1 in c1(c_id)
+    loop
+    
+        select max(score) into m from test_taken
+        where tid = r1.tid
+        group by tid;
+        
+        dbms_output.put_line(r1.tid || ' - ' || m);
+    
+    end loop;
+end;
+/
